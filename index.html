@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bytinho — Pet Virtual de Programação</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #eeede8;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b67;
+      --text-tertiary: #9e9d98;
+      --border-light: rgba(0,0,0,0.12);
+      --border-medium: rgba(0,0,0,0.22);
+      --purple-50: #EEEDFE;
+      --purple-100: #CECBF6;
+      --purple-400: #7F77DD;
+      --purple-600: #534AB7;
+      --purple-800: #3C3489;
+      --amber-50: #FAEEDA;
+      --amber-100: #FAC775;
+      --amber-800: #633806;
+      --teal-50: #E1F5EE;
+      --teal-100: #9FE1CB;
+      --teal-800: #085041;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e1e1c;
+        --bg-secondary: #2a2a28;
+        --bg-tertiary: #161614;
+        --text-primary: #f0efe8;
+        --text-secondary: #a8a8a0;
+        --text-tertiary: #6b6b64;
+        --border-light: rgba(255,255,255,0.1);
+        --border-medium: rgba(255,255,255,0.18);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h1.app-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .save-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .save-btn {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary);
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+    .save-btn:hover { background: var(--bg-secondary); }
+
+    .pet-stage {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border-light);
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .pet-name { font-size: 17px; font-weight: 500; color: var(--text-primary); margin-top: 6px; }
+    .pet-level { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .pet-mood { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-style: italic; }
+
+    .xp-wrap {
+      width: 100%;
+      background: var(--bg-primary);
+      border-radius: 99px;
+      height: 7px;
+      border: 0.5px solid var(--border-light);
+      overflow: hidden;
+      margin: 8px 0 3px;
+    }
+    .xp-fill { height: 100%; border-radius: 99px; background: var(--purple-600); transition: width 0.5s ease; }
+    .xp-lbl { font-size: 11px; color: var(--text-secondary); }
+
+    .streak-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+    .streak-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500; padding: 4px 10px;
+      border-radius: 99px;
+      background: var(--amber-50); color: var(--amber-800);
+      border: 0.5px solid var(--amber-100);
+    }
+
+    .streak-days { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
+    .day-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--bg-primary); border: 0.5px solid var(--border-medium);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: var(--text-secondary);
+    }
+    .day-dot.active { background: var(--purple-600); border-color: var(--purple-600); color: var(--purple-50); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-light);
+      padding: 10px 8px; text-align: center;
+    }
+    .stat-val { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+    .stat-lbl { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+    .section-lbl { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 6px; }
+
+    .actions-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .act-btn {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 10px 12px; cursor: pointer;
+      text-align: left; transition: background 0.15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .act-btn:hover { background: var(--bg-secondary); }
+    .act-btn:active { transform: scale(0.98); }
+    .act-btn i { font-size: 18px; color: var(--text-secondary); }
+    .btn-title { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .btn-xp { font-size: 11px; color: var(--text-secondary); }
+
+    .tasks-area {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border-light);
+      padding: 1rem;
+    }
+
+    .task-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 0.5px solid var(--border-light);
+    }
+    .task-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .task-check {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px; transition: background 0.15s;
+    }
+    .task-check.done { background: var(--purple-600); border-color: var(--purple-600); }
+    .task-check.done i { color: var(--purple-50) !important; }
+    .task-check i { font-size: 12px; color: transparent; }
+    .task-text { font-size: 13px; color: var(--text-primary); line-height: 1.4; flex: 1; }
+    .task-text.done { text-decoration: line-through; color: var(--text-secondary); }
+    .task-xp { font-size: 11px; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; }
+
+    .gen-btn {
+      width: 100%; background: var(--bg-primary);
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 9px; cursor: pointer; font-size: 13px;
+      color: var(--text-primary);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.15s; margin-bottom: 8px;
+    }
+    .gen-btn:hover { background: var(--bg-secondary); }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .ai-loading { font-size: 12px; color: var(--text-secondary); text-align: center; padding: 12px; font-style: italic; }
+
+    .badges-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; padding: 3px 8px; border-radius: 99px;
+      background: var(--purple-50); color: var(--purple-800);
+      border: 0.5px solid var(--purple-100);
+    }
+
+    .log-box {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-light);
+      padding: 0.75rem 1rem;
+      max-height: 120px; overflow-y: auto;
+    }
+    .log-item { font-size: 12px; color: var(--text-secondary); padding: 2px 0; border-bottom: 0.5px solid var(--border-light); }
+    .log-item:last-child { border-bottom: none; }
+
+    .toast-wrap { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+    .toast {
+      background: var(--purple-600); color: var(--purple-50);
+      font-size: 13px; padding: 8px 18px; border-radius: 99px;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    .api-key-box {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border-light);
+      padding: 1rem;
+    }
+    .api-key-box p { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .api-key-row { display: flex; gap: 6px; }
+    .api-key-row input {
+      flex: 1; font-size: 13px; padding: 6px 10px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary); color: var(--text-primary);
+      outline: none;
+    }
+    .api-key-row input:focus { box-shadow: 0 0 0 2px var(--purple-100); }
+    .api-key-row button {
+      font-size: 12px; padding: 6px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--purple-600); color: var(--purple-50);
+      cursor: pointer;
+    }
+    .api-key-row button:hover { opacity: 0.9; }
+    .api-notice { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <h1 class="app-title"><i class="ti ti-device-gamepad-2" style="font-size:22px;color:var(--purple-600)" aria-hidden="true"></i> Bytinho</h1>
+    <div class="save-row">
+      <button class="save-btn" onclick="saveState()"><i class="ti ti-device-floppy" style="font-size:13px" aria-hidden="true"></i> Salvar</button>
+      <button class="save-btn" onclick="resetState()"><i class="ti ti-refresh" style="font-size:13px" aria-hidden="true"></i> Resetar</button>
+    </div>
+  </div>
+
+  <div class="pet-stage">
+    <div id="pet-art"></div>
+    <div class="pet-name" id="pet-name">Bytinho</div>
+    <div class="pet-level" id="pet-level">Nível 1 · Filhote de Bug</div>
+    <div class="xp-wrap"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+    <div class="xp-lbl" id="xp-lbl">0 / 100 XP</div>
+    <div class="pet-mood" id="pet-mood">"Me alimente com commits..."</div>
+    <div class="streak-row">
+      <div class="streak-pill">
+        <i class="ti ti-flame" style="font-size:14px" aria-hidden="true"></i>
+        <span id="streak-count">0</span> dias seguidos
+      </div>
+    </div>
+    <div class="streak-days" id="streak-days"></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="s-commits">0</div><div class="stat-lbl">Commits</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-bugs">0</div><div class="stat-lbl">Bugs corrigidos</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-study">0</div><div class="stat-lbl">Horas de estudo</div></div>
+  </div>
+
+  <div>
+    <p class="section-lbl">O que você fez hoje?</p>
+    <div class="actions-grid">
+      <button class="act-btn" onclick="doAction('commit')"><i class="ti ti-git-commit" aria-hidden="true"></i><div><div class="btn-title">Fiz um commit</div><div class="btn-xp">+15 XP</div></div></button>
+      <button class="act-btn" onclick="doAction('bug')"><i class="ti ti-bug" aria-hidden="true"></i><div><div class="btn-title">Corrigi um bug</div><div class="btn-xp">+20 XP</div></div></button>
+      <button class="act-btn" onclick="doAction('study')"><i class="ti ti-book" aria-hidden="true"></i><div><div class="btn-title">Estudei 1h</div><div class="btn-xp">+12 XP</div></div></button>
+      <button class="act-btn" onclick="doAction('review')"><i class="ti ti-code" aria-hidden="true"></i><div><div class="btn-title">Code review</div><div class="btn-xp">+10 XP</div></div></button>
+      <button class="act-btn" onclick="doAction('deploy')"><i class="ti ti-rocket" aria-hidden="true"></i><div><div class="btn-title">Fiz um deploy</div><div class="btn-xp">+25 XP</div></div></button>
+      <button class="act-btn" onclick="doAction('break')"><i class="ti ti-coffee" aria-hidden="true"></i><div><div class="btn-title">Fiz uma pausa</div><div class="btn-xp">+5 XP</div></div></button>
+    </div>
+  </div>
+
+  <div>
+    <p class="section-lbl">Tarefas de hoje geradas pela IA</p>
+    <div class="tasks-area">
+      <div class="api-key-box" id="api-key-box" style="margin-bottom:10px">
+        <p>Cole a sua chave de API da Anthropic para ativar as tarefas com IA:</p>
+        <div class="api-key-row">
+          <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+          <button onclick="saveApiKey()">Salvar</button>
+        </div>
+        <div class="api-notice">A chave fica salva apenas no seu navegador (localStorage). Nunca é enviada a terceiros.</div>
+      </div>
+      <button class="gen-btn" id="gen-btn" onclick="generateTasks()">
+        <i class="ti ti-sparkles" style="font-size:15px" aria-hidden="true"></i> Gerar tarefas para hoje
+      </button>
+      <div id="tasks-list">
+        <div style="font-size:12px;color:var(--text-secondary);font-style:italic;text-align:center;padding:6px 0">
+          Configure sua chave de API e clique para gerar tarefas personalizadas
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="badges-row" id="badges-row"></div>
+
+  <div>
+    <p class="section-lbl">Histórico</p>
+    <div class="log-box" id="log"></div>
+  </div>
+
+  <div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+</div>
+
+<script>
+const STORAGE_KEY = "bytinho_v2";
+const API_KEY_STORAGE = "bytinho_apikey";
+
+const defaultState = {
+  xp:0, level:1, commits:0, bugs:0, study:0,
+  badges:[], log:[], streak:0,
+  lastActiveDate:null,
+  streakHistory:[],
+  tasks:[]
+};
+
+let state = JSON.parse(JSON.stringify(defaultState));
+
+const levels = [
+  {min:0,   max:100,  name:"Filhote de Bug",    mood:'"Me alimente com commits..."'},
+  {min:100, max:250,  name:"Hello World",        mood:'"Já sei printar na tela!"'},
+  {min:250, max:500,  name:"Estagiário Curioso", mood:'"Git push, vamos lá!"'},
+  {min:500, max:900,  name:"Dev Júnior",         mood:'"Stack Overflow é meu amigo."'},
+  {min:900, max:1500, name:"Dev Pleno",          mood:'"Eu refatoro, logo existo."'},
+  {min:1500,max:99999,name:"Arquiteto do Caos",  mood:'"Works on my machine."'}
+];
+
+const actions = {
+  commit: {xp:15, label:"Fez um commit",    stat:"commits"},
+  bug:    {xp:20, label:"Corrigiu um bug",  stat:"bugs"},
+  study:  {xp:12, label:"Estudou 1h",       stat:"study"},
+  review: {xp:10, label:"Code review feito"},
+  deploy: {xp:25, label:"Deploy feito"},
+  break:  {xp:5,  label:"Pausa feita"}
+};
+
+const badgeDefs = [
+  {id:"first_commit", cond:s=>s.commits>=1,  label:"Primeiro commit"},
+  {id:"bug_hunter",   cond:s=>s.bugs>=3,     label:"Caçador de bugs"},
+  {id:"student",      cond:s=>s.study>=5,    label:"Estudante dedicado"},
+  {id:"deploy_hero",  cond:s=>s.xp>=100,     label:"Deploy hero"},
+  {id:"streak3",      cond:s=>s.streak>=3,   label:"3 dias seguidos"},
+  {id:"streak7",      cond:s=>s.streak>=7,   label:"Semana completa"},
+  {id:"lv3",          cond:s=>s.level>=3,    label:"Dev em evolução"},
+  {id:"lv5",          cond:s=>s.level>=5,    label:"Quase sênior"}
+];
+
+function getPetSVG(level) {
+  const colors = ["#CECBF6","#9FE1CB","#FAC775","#F4C0D1","#B5D4F4","#C0DD97"];
+  const eyes = [
+    "M-8 0 Q-4 -4 0 0 Q4 -4 8 0",
+    "M-8 0 Q-4 4 0 0 Q4 4 8 0",
+    "M-8 -2 Q-4 2 0 -2 Q4 2 8 -2",
+    "M-8 1 L-4 -3 L0 1 L4 -3 L8 1",
+    "M-6 2 Q-3 -4 0 2 Q3 -4 6 2",
+    "M-10 -2 Q-5 6 0 -2 Q5 6 10 -2"
+  ];
+  const extras = [
+    "",
+    "<circle cx='0' cy='30' r='4' fill='#AFA9EC' opacity='.6'/>",
+    "<rect x='-12' y='26' width='24' height='6' rx='3' fill='#5DCAA5' opacity='.5'/>",
+    "<circle cx='-18' cy='-5' r='5' fill='#FAC775' opacity='.7'/><circle cx='18' cy='-5' r='5' fill='#FAC775' opacity='.7'/>",
+    "<path d='M-14 28 Q0 38 14 28' fill='none' stroke='#185FA5' stroke-width='2.5' stroke-linecap='round'/>",
+    "<path d='M-20 -25 L0 -38 L20 -25' fill='none' stroke='#533AB7' stroke-width='2'/><circle cx='0' cy='-42' r='5' fill='#534AB7'/>"
+  ];
+  const idx = Math.min(level - 1, 5);
+  const c = colors[idx];
+  const sz = 40 + idx * 6;
+  return `<svg viewBox="-65 -65 130 130" xmlns="http://www.w3.org/2000/svg" style="width:100px;height:100px">
+    <ellipse cx="0" cy="${sz*.35}" rx="${sz*.75}" ry="${sz*.28}" fill="${c}" opacity=".15"/>
+    <ellipse cx="-${sz*.4}" cy="-${sz*.55}" rx="${sz*.2}" ry="${sz*.28}" fill="${c}"/>
+    <ellipse cx="${sz*.4}" cy="-${sz*.55}" rx="${sz*.2}" ry="${sz*.28}" fill="${c}"/>
+    <ellipse cx="0" cy="0" rx="${sz}" ry="${sz}" fill="${c}"/>
+    <ellipse cx="-${sz*.3}" cy="-${sz*.12}" rx="${sz*.17}" ry="${sz*.2}" fill="white"/>
+    <ellipse cx="${sz*.3}" cy="-${sz*.12}" rx="${sz*.17}" ry="${sz*.2}" fill="white"/>
+    <ellipse cx="-${sz*.3}" cy="-${sz*.12}" rx="${sz*.09}" ry="${sz*.12}" fill="#2C2C2A"/>
+    <ellipse cx="${sz*.3}" cy="-${sz*.12}" rx="${sz*.09}" ry="${sz*.12}" fill="#2C2C2A"/>
+    <g transform="translate(0,${sz*.28})">
+      <path d="${eyes[idx]}" fill="none" stroke="#2C2C2A" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    ${extras[idx]}
+  </svg>`;
+}
+
+function getLvData() {
+  for (let i = levels.length - 1; i >= 0; i--) {
+    if (state.xp >= levels[i].min) return {...levels[i], idx: i + 1};
+  }
+  return {...levels[0], idx: 1};
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function updateStreak() {
+  const today = todayStr();
+  if (state.lastActiveDate === today) return;
+  if (state.lastActiveDate) {
+    const last = new Date(state.lastActiveDate);
+    const now = new Date(today);
+    const diff = Math.round((now - last) / (1000 * 60 * 60 * 24));
+    state.streak = diff === 1 ? state.streak + 1 : 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastActiveDate = today;
+  if (!state.streakHistory.includes(today)) {
+    state.streakHistory.push(today);
+    if (state.streakHistory.length > 14) state.streakHistory.shift();
+  }
+}
+
+function renderStreakDots() {
+  const el = document.getElementById("streak-days");
+  const days = ["D","S","T","Q","Q","S","S"];
+  const today = new Date();
+  el.innerHTML = "";
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    const active = state.streakHistory.includes(ds);
+    const dot = document.createElement("div");
+    dot.className = "day-dot" + (active ? " active" : "");
+    dot.textContent = days[d.getDay()];
+    el.appendChild(dot);
+  }
+}
+
+function render() {
+  const lv = getLvData();
+  state.level = lv.idx;
+  const pct = Math.min(100, Math.round((state.xp - lv.min) / (lv.max - lv.min) * 100));
+
+  document.getElementById("pet-art").innerHTML = getPetSVG(state.level);
+  document.getElementById("pet-level").textContent = `Nível ${state.level} · ${lv.name}`;
+  document.getElementById("xp-bar").style.width = pct + "%";
+  document.getElementById("xp-lbl").textContent = `${state.xp} / ${lv.max} XP`;
+  document.getElementById("pet-mood").textContent = lv.mood;
+  document.getElementById("streak-count").textContent = state.streak;
+  document.getElementById("s-commits").textContent = state.commits;
+  document.getElementById("s-bugs").textContent = state.bugs;
+  document.getElementById("s-study").textContent = state.study;
+
+  renderStreakDots();
+
+  const br = document.getElementById("badges-row");
+  br.innerHTML = "";
+  badgeDefs.forEach(b => {
+    if (b.cond(state) && !state.badges.includes(b.id)) {
+      state.badges.push(b.id);
+      showToast("Conquista desbloqueada: " + b.label);
+    }
+    if (state.badges.includes(b.id)) {
+      const s = document.createElement("span");
+      s.className = "badge";
+      s.innerHTML = `<i class="ti ti-award" aria-hidden="true" style="font-size:11px"></i> ${b.label}`;
+      br.appendChild(s);
+    }
+  });
+
+  const logEl = document.getElementById("log");
+  logEl.innerHTML = state.log.length === 0
+    ? '<div class="log-item" style="color:var(--text-tertiary);font-style:italic">Nenhuma ação ainda...</div>'
+    : state.log.slice().reverse().map(l => `<div class="log-item">${l}</div>`).join("");
+
+  renderTasks();
+}
+
+function renderTasks() {
+  const el = document.getElementById("tasks-list");
+  if (!state.tasks || state.tasks.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text-secondary);font-style:italic;text-align:center;padding:6px 0">Clique para gerar tarefas personalizadas com IA</div>';
+    return;
+  }
+  el.innerHTML = state.tasks.map((t, i) => `
+    <div class="task-item">
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${i})" role="checkbox" aria-checked="${t.done}" aria-label="${t.text}">
+        <i class="ti ti-check" aria-hidden="true"></i>
+      </div>
+      <div class="task-text ${t.done ? 'done' : ''}">${t.text}</div>
+      <div class="task-xp">+${t.xp} XP</div>
+    </div>`).join("");
+}
+
+function toggleTask(i) {
+  const t = state.tasks[i];
+  if (t.done) return;
+  t.done = true;
+  state.xp += t.xp;
+  const ts = getTimestamp();
+  state.log.push(`[${ts}] Tarefa: "${t.text}" +${t.xp} XP`);
+  updateStreak();
+  render();
+  saveState();
+  showToast(`+${t.xp} XP — tarefa concluída!`);
+}
+
+function doAction(type) {
+  const a = actions[type];
+  const prevLevel = state.level;
+  state.xp += a.xp;
+  if (a.stat === "commits") state.commits++;
+  if (a.stat === "bugs") state.bugs++;
+  if (a.stat === "study") state.study++;
+  state.log.push(`[${getTimestamp()}] ${a.label} +${a.xp} XP`);
+  updateStreak();
+  render();
+  saveState();
+  if (state.level > prevLevel) setTimeout(() => showToast("Level up! Bytinho evoluiu!"), 300);
+  else showToast(`+${a.xp} XP — ${a.label}`);
+}
+
+async function generateTasks() {
+  const apiKey = localStorage.getItem(API_KEY_STORAGE);
+  if (!apiKey) {
+    showToast("Configure sua chave de API primeiro");
+    return;
+  }
+  const btn = document.getElementById("gen-btn");
+  const el = document.getElementById("tasks-list");
+  btn.disabled = true;
+  el.innerHTML = '<div class="ai-loading"><i class="ti ti-loader" style="font-size:14px" aria-hidden="true"></i> A IA está gerando suas tarefas...</div>';
+
+  const context = `Nível ${state.level} (${getLvData().name}), ${state.commits} commits, ${state.bugs} bugs corrigidos, ${state.study}h de estudo, streak de ${state.streak} dias. XP total: ${state.xp}.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 800,
+        system: `Você é um coach de programação gamificado. Gere exatamente 4 tarefas de programação práticas e motivadoras para o dev fazer hoje, baseadas no perfil. Responda SOMENTE em JSON válido, sem markdown, sem texto extra. Formato: {"tasks":[{"text":"descrição curta em português","xp":número entre 10 e 30},...]}. Tarefas devem ser específicas, acionáveis e variadas.`,
+        messages: [{role: "user", content: context}]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content.map(c => c.text || "").join("");
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    state.tasks = parsed.tasks.map(t => ({...t, done: false}));
+    saveState();
+    render();
+    showToast("Tarefas geradas pela IA!");
+  } catch (e) {
+    el.innerHTML = `<div style="font-size:12px;color:#E24B4A;padding:6px 0;text-align:center">Erro: ${e.message || "Tente novamente."}</div>`;
+  }
+  btn.disabled = false;
+}
+
+function saveApiKey() {
+  const val = document.getElementById("api-key-input").value.trim();
+  if (!val.startsWith("sk-ant-")) {
+    showToast("Chave inválida. Deve começar com sk-ant-");
+    return;
+  }
+  localStorage.setItem(API_KEY_STORAGE, val);
+  document.getElementById("api-key-box").style.display = "none";
+  showToast("Chave salva com sucesso!");
+}
+
+function getTimestamp() {
+  const now = new Date();
+  return now.getHours().toString().padStart(2,"0") + ":" + now.getMinutes().toString().padStart(2,"0");
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      state = {...defaultState, ...JSON.parse(saved)};
+    } catch(e) {}
+  }
+  const apiKey = localStorage.getItem(API_KEY_STORAGE);
+  if (apiKey) {
+    document.getElementById("api-key-box").style.display = "none";
+  }
+  render();
+}
+
+loadState();
+</script>
+</body>
+</html>
