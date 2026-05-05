@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bytinho — Pet Virtual de Programação</title>
+  <title>Bytinho — DevPet</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -271,10 +271,10 @@
   <div class="pet-stage">
     <div id="pet-art"></div>
     <div class="pet-name" id="pet-name">Bytinho</div>
-    <div class="pet-level" id="pet-level">Nível 1 · Filhote de Bug</div>
+    <div class="pet-level" id="pet-level">Nível 1 · Bugzinho</div>
     <div class="xp-wrap"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
     <div class="xp-lbl" id="xp-lbl">0 / 100 XP</div>
-    <div class="pet-mood" id="pet-mood">"Me alimente com commits..."</div>
+    <div class="pet-mood" id="pet-mood">"Alimenta-me com commits..."</div>
     <div class="streak-row">
       <div class="streak-pill">
         <i class="ti ti-flame" style="font-size:14px" aria-hidden="true"></i>
@@ -291,7 +291,7 @@
   </div>
 
   <div>
-    <p class="section-lbl">O que você fez hoje?</p>
+    <p class="section-lbl">O que já fizeste oh perguiçosa?</p>
     <div class="actions-grid">
       <button class="act-btn" onclick="doAction('commit')"><i class="ti ti-git-commit" aria-hidden="true"></i><div><div class="btn-title">Fiz um commit</div><div class="btn-xp">+15 XP</div></div></button>
       <button class="act-btn" onclick="doAction('bug')"><i class="ti ti-bug" aria-hidden="true"></i><div><div class="btn-title">Corrigi um bug</div><div class="btn-xp">+20 XP</div></div></button>
@@ -303,22 +303,22 @@
   </div>
 
   <div>
-    <p class="section-lbl">Tarefas de hoje geradas pela IA</p>
+    <p class="section-lbl">Tarefas de hoje geradas por IA</p>
     <div class="tasks-area">
       <div class="api-key-box" id="api-key-box" style="margin-bottom:10px">
-        <p>Cole a sua chave de API da Anthropic para ativar as tarefas com IA:</p>
+        <p>Cola a tua chave de API da Anthropic para ativar as tarefas com IA:</p>
         <div class="api-key-row">
           <input type="password" id="api-key-input" placeholder="sk-ant-..." />
           <button onclick="saveApiKey()">Salvar</button>
         </div>
-        <div class="api-notice">A chave fica salva apenas no seu navegador (localStorage). Nunca é enviada a terceiros.</div>
+        <div class="api-notice">A chave fica salva apenas no teu navegador (localStorage). Nunca é enviada a terceiros.</div>
       </div>
       <button class="gen-btn" id="gen-btn" onclick="generateTasks()">
         <i class="ti ti-sparkles" style="font-size:15px" aria-hidden="true"></i> Gerar tarefas para hoje
       </button>
       <div id="tasks-list">
         <div style="font-size:12px;color:var(--text-secondary);font-style:italic;text-align:center;padding:6px 0">
-          Configure sua chave de API e clique para gerar tarefas personalizadas
+          Configura a tua chave de API e clica para gerar tarefas personalizadas
         </div>
       </div>
     </div>
@@ -350,7 +350,7 @@ const defaultState = {
 let state = JSON.parse(JSON.stringify(defaultState));
 
 const levels = [
-  {min:0,   max:100,  name:"Filhote de Bug",    mood:'"Me alimente com commits..."'},
+  {min:0,   max:100,  name:"Bugzinho",           mood:'"Me alimente com commits..."'},
   {min:100, max:250,  name:"Hello World",        mood:'"Já sei printar na tela!"'},
   {min:250, max:500,  name:"Estagiário Curioso", mood:'"Git push, vamos lá!"'},
   {min:500, max:900,  name:"Dev Júnior",         mood:'"Stack Overflow é meu amigo."'},
